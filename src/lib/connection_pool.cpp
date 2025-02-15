@@ -82,18 +82,12 @@ void ConnectionPool::updateConnection() {
   auto conn = pool.front();  // The first connection.
 
   for (size_t i = 0; i < pool.size(); i++) {
-    if (conn.use_count() <= 2) {
-      pool.pop();
-      while (!conn->connected()) {
-        try {
-          conn->connect(this->dataSource, this->username, this->password);
-        } catch (...) {
-          std::clog << "Connection pool: failed to reconnect" << std::endl;
-        }
-      }
+    pool.pop();
+    if (!conn->connected()) {
+      conn =
+          std::make_shared<nanodbc::connection>(dataSource, username, password);
     }
     pool.push(conn);
-    conn = pool.front();  // Process the next connection
   }
 }
 }  // namespace brscomp

@@ -1,6 +1,7 @@
 #include "router.h"
 
 #include <boost/json.hpp>
+#include <cctype>
 #include <list>
 #include <ranges>
 #include <string_view>
@@ -86,7 +87,9 @@ Router &Router::route(const std::string &url) {
   // Remove the empty words from the list, including those that contains only
   // empty letters
   words.remove_if([](const std::string &word) {
-    return word.empty() || std::all_of(word.begin(), word.end(), isspace);
+    return word.empty() ||
+           std::all_of(word.begin(), word.end(),
+                       [](unsigned char c) { return std::isspace(c); });
   });
 
   auto it = words.begin();
@@ -120,7 +123,9 @@ Router &Router::route(std::string &&url) {
   // Remove the empty words from the list, including those that contains only
   // empty letters
   words.remove_if([](const std::string &word) {
-    return word.empty() || std::all_of(word.begin(), word.end(), isspace);
+    return word.empty() ||
+           std::all_of(word.begin(), word.end(),
+                       [](unsigned char c) { return std::isspace(c); });
   });
 
   auto it = words.begin();
@@ -150,7 +155,9 @@ void Router::call(const std::string &url, Method method, WFHttpTask *task,
 
   std::list<std::string> words(segments.begin(), segments.end());
   words.remove_if([](const std::string &word) {
-    return word.empty() || std::all_of(word.begin(), word.end(), isspace);
+    return word.empty() ||
+           std::all_of(word.begin(), word.end(),
+                       [](unsigned char c) { return std::isspace(c); });
   });
 
   auto it = words.begin();
